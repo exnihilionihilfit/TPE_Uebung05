@@ -2,18 +2,21 @@ package de.hs_mannheim_ib.tpe.chr_luk.uebung_05;
 
 import java.util.Date;
 
-public class Pump extends Component implements Runnable{
+public class Pump extends Component implements Runnable {
 
 	// pump power in water per second
 	private double pumpPower;
 	private CoolingCircuit cc; // cooling circuit
 	private WaterPackage tmpPackage;
 	private Date timeStamp;
+	private double pumpInterval;
+	private boolean shutdown;
 
 	public Pump(float pumpPower, CoolingCircuit cc) {
 		this.pumpPower = pumpPower;
 		this.cc = cc;
 		this.timeStamp = new Date();
+		this.pumpInterval = 1000 / this.pumpPower;
 	}
 
 	public void pumping() {
@@ -43,41 +46,37 @@ public class Pump extends Component implements Runnable{
 	@Override
 	public void run() {
 
-		while (true) {
+		while (!Thread.interrupted()) {
 
-	
-			synchronized (cc) {
-				
-				while(cc.){
-					
-				}
-				
-				
+			if (!this.isShutdown()) {
 
-				if (new Date().getTime() - this.timeStamp.getTime() > 1000/this.pumpPower) {
+				synchronized (cc) {
+			
 
-					this.pumping();
-
-					this.cc.getRecupReactor().coolingWater(
-					        this.cc.getWaterPackages().get(3));
-
-					this.cc.getRecupRiver().coolingWater(
-					        this.cc.getWaterPackages().get(9));
+					// System.out.println("pump is working");
 
 					this.timeStamp = new Date();
+					this.pumping();
+					cc.notifyAll();
+					while (new Date().getTime() - this.timeStamp.getTime() < this.pumpInterval) {
+
+						try {
+							cc.wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+					}
 
 				}
-				
-				try {
-	                Thread.sleep(10);
-	            } catch (InterruptedException e) {
-	                // TODO Auto-generated catch block
-	                e.printStackTrace();
-	            }
 
-	            
-            }
-
+			}else{
+				synchronized (cc) {
+					cc.notifyAll();
+					
+				}
+			}
 		}
 	}
 
