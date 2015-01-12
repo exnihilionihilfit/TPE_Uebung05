@@ -1,12 +1,16 @@
-package de.hs_mannheim_ib.tpe.chr_luk.uebung_05;
+package de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component;
 
 import java.util.Date;
 
+import de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component.cooling.CoolingCircuit;
+import de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component.cooling.WaterPackage;
+import de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.control.ErrorMessage;
+
 public class Reactor extends Component implements Runnable, Heatable {
 
-	int warming; // C° per second
-	float maxTemp; // C°
-	float coreTemp; // C°
+	private int warming; // C° per second
+	private float maxTemp; // C°
+	private float coreTemp; // C°
 	private long timeStamp; // time
 	private long tmpTime = 0;
 	private CoolingCircuit cc;
@@ -44,8 +48,9 @@ public class Reactor extends Component implements Runnable, Heatable {
 							cc.notifyAll();
 							cc.wait();
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							ErrorMessage.addToList(e);
+						
+						
 						}
 						tmpTime = new Date().getTime() - this.timeStamp;
 					}
@@ -57,9 +62,17 @@ public class Reactor extends Component implements Runnable, Heatable {
 						this.coreTemp += (float) tmpTime / 1000 * this.warming;
 						this.timeStamp = new Date().getTime();
 					}
+					
+		
 
+					cc.notifyAll();
+					try {
+			            Thread.sleep(10);
+		            } catch (InterruptedException e) {
+		            	ErrorMessage.addToList(e);
+		            }
 				}
-
+			
 			} else {
 			
 				Thread.currentThread().interrupt();
@@ -94,9 +107,16 @@ public class Reactor extends Component implements Runnable, Heatable {
 
 	@Override
 	public String toString() {
-		
-		return "Core Temperature: " + Math.round(this.coreTemp)
-		        + " [ is aktive  " + !this.isShutdown() + " ]";
+		String output =  ""; 
+	
+		if(this.isOverheated()){
+			output += " [OVERHEATED] ";
+		}
+		if(this.isShutdown()){
+			output += " [reactor offline]\n ";
+		}
+		 output += "Core Temperature: " + Math.round(this.coreTemp);
+		return output;
 	}
 
 
@@ -111,7 +131,7 @@ public class Reactor extends Component implements Runnable, Heatable {
 		}
 	}
 	
-	protected void coolingComponent() {
+	public void coolingComponent() {
 
 		if (this.isWaterPumped()) {
 			this.recuperator.coolComponent();

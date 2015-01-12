@@ -1,26 +1,28 @@
-package de.hs_mannheim_ib.tpe.chr_luk.uebung_05;
+package de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component.cooling;
+
+import de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component.Heatable;
 
 public class WaterPackage implements Heatable{
 
 	int liter;
-	float temperature; // C° * 100
-	int number;
+	private float temperature; // C° * 100
+	private int number;
 	
 	public WaterPackage(int liter,float tempRiver,int number){
 		this.liter = liter;
-		this.temperature = tempRiver;
-		this.number = number;
+		this.setTemperature(tempRiver);
+		this.setNumber(number);
 	}
 
 	@Override
     public void setHeat(float heat) {
 		
-	   this.temperature = heat;	    
+	   this.setTemperature(heat);	    
     }
 
 	@Override
     public float getHeat() {
-		return temperature;
+		return getTemperature();
     }
 
 	/* (non-Javadoc)
@@ -37,10 +39,10 @@ public class WaterPackage implements Heatable{
 	    WaterPackage other = (WaterPackage) obj;
 	    if (liter != other.liter)
 		    return false;
-	    if (number != other.number)
+	    if (getNumber() != other.getNumber())
 		    return false;
-	    if (Float.floatToIntBits(temperature) != Float
-	            .floatToIntBits(other.temperature))
+	    if (Float.floatToIntBits(getTemperature()) != Float
+	            .floatToIntBits(other.getTemperature()))
 		    return false;
 	    return true;
     }
@@ -53,9 +55,25 @@ public class WaterPackage implements Heatable{
 	    final int prime = 31;
 	    int result = 1;
 	    result = prime * result + liter;
-	    result = prime * result + number;
-	    result = prime * result + Float.floatToIntBits(temperature);
+	    result = prime * result + getNumber();
+	    result = prime * result + Float.floatToIntBits(getTemperature());
 	    return result;
+    }
+
+	public int getNumber() {
+	    return number;
+    }
+
+	public void setNumber(int number) {
+	    this.number = number;
+    }
+
+	public float getTemperature() {
+	    return temperature;
+    }
+
+	public void setTemperature(float temperature) {
+	    this.temperature = temperature;
     }
 
 }

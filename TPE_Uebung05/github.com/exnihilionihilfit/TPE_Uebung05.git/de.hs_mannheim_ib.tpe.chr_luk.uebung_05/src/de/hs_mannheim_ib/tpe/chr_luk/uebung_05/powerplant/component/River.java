@@ -1,6 +1,9 @@
-package de.hs_mannheim_ib.tpe.chr_luk.uebung_05;
+package de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component;
 
 import java.util.Date;
+
+import de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component.cooling.CoolingCircuit;
+import de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component.cooling.WaterPackage;
 
 public class River extends Component implements  Heatable {
 

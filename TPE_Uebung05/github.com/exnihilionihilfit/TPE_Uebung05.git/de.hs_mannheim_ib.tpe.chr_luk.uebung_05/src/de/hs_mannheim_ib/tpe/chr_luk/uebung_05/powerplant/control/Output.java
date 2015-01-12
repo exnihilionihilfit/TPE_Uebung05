@@ -1,6 +1,10 @@
-package de.hs_mannheim_ib.tpe.chr_luk.uebung_05;
+package de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.control;
 
 import java.util.Date;
+
+import de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component.Component;
+import de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component.cooling.CoolingCircuit;
+import de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component.cooling.WaterPackage;
 
 public class Output implements Runnable {
 
@@ -8,11 +12,13 @@ public class Output implements Runnable {
 	private Component[] components;
 	private Date timeStamp;
 	private volatile boolean shutdown;
+	private final long timeWait;
 
 	public Output(CoolingCircuit cc, Component[] components) {
 		this.cc = cc;
 		this.components = components;
 		this.timeStamp = new Date();
+		this.timeWait = 1000;
 	}
 
 	@Override
@@ -23,14 +29,13 @@ public class Output implements Runnable {
 			if (!this.isShutdown()) {
 				synchronized (cc) {
 
-					while (new Date().getTime() - this.timeStamp.getTime() < 1000) {
+					while (this.getTimeDiv() < this.timeWait) {
 					
 						try {
 							cc.notifyAll();
 							cc.wait();
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							ErrorMessage.addToList(e);
 						}
 
 					}
@@ -42,21 +47,32 @@ public class Output implements Runnable {
 					System.out.println("");
 					String tmp = "";
 					for (WaterPackage pack : cc.getWaterPackages()) {
-						tmp += " [" + pack.number + "] "
-						        + Math.round(pack.temperature);
+						tmp += " [" + pack.getNumber() + "] "
+						        + Math.round(pack.getTemperature());
 					}
 					System.out.println(tmp);
 
 					this.timeStamp = new Date();
 					cc.notifyAll();
+					try {
+			            Thread.sleep(10);
+		            } catch (InterruptedException e) {
+		            	ErrorMessage.addToList(e);
+		            }
 				
 				}
 			}else{
 				Thread.currentThread().interrupt();
 			}
+			
 		}
 
 	}
+
+	private long getTimeDiv() {
+	  
+	    return (new Date().getTime() - this.timeStamp.getTime()) ;
+    }
 
 	private boolean isShutdown() {
 

@@ -1,6 +1,10 @@
-package de.hs_mannheim_ib.tpe.chr_luk.uebung_05;
+package de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component;
 
 import java.util.Date;
+
+import de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component.cooling.CoolingCircuit;
+import de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component.cooling.WaterPackage;
+import de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.control.ErrorMessage;
 
 public class Pump extends Component implements Runnable {
 
@@ -57,8 +61,7 @@ public class Pump extends Component implements Runnable {
 							cc.notifyAll();
 							cc.wait();
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							ErrorMessage.addToList(e);
 						}
 
 					}
@@ -68,11 +71,18 @@ public class Pump extends Component implements Runnable {
 					this.timeStamp = new Date();
 					this.pumping();
 					cc.notifyAll();
-					
+				
+					try {
+			            Thread.sleep(10);
+		            } catch (InterruptedException e) {
+		            	ErrorMessage.addToList(e);
+		            }
 				}
 			}else{
 				Thread.currentThread().interrupt();
 			}
+			
+			
 		}
 	}
 
