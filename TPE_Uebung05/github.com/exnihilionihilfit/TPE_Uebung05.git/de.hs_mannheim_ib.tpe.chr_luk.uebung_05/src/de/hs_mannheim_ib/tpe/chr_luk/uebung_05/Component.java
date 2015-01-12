@@ -28,4 +28,6 @@ public class Component {
 	public void setShutdown(boolean shutdown) {
 		this.shutdown = shutdown;
 	}
+	
+	
 }

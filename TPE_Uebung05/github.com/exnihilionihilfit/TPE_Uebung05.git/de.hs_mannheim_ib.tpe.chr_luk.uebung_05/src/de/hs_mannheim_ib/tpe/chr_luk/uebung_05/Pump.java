@@ -10,7 +10,7 @@ public class Pump extends Component implements Runnable {
 	private WaterPackage tmpPackage;
 	private Date timeStamp;
 	private double pumpInterval;
-	private boolean shutdown;
+	private volatile boolean shutdown;
 
 	public Pump(float pumpPower, CoolingCircuit cc) {
 		this.pumpPower = pumpPower;
@@ -46,21 +46,15 @@ public class Pump extends Component implements Runnable {
 	@Override
 	public void run() {
 
-		while (!Thread.interrupted()) {
-
+		while (!Thread.currentThread().isInterrupted()) {
+		
 			if (!this.isShutdown()) {
-
 				synchronized (cc) {
-			
 
-					// System.out.println("pump is working");
-
-					this.timeStamp = new Date();
-					this.pumping();
-					cc.notifyAll();
 					while (new Date().getTime() - this.timeStamp.getTime() < this.pumpInterval) {
-
+					
 						try {
+							cc.notifyAll();
 							cc.wait();
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
@@ -69,13 +63,15 @@ public class Pump extends Component implements Runnable {
 
 					}
 
-				}
+					// System.out.println("pump is working");
 
-			}else{
-				synchronized (cc) {
+					this.timeStamp = new Date();
+					this.pumping();
 					cc.notifyAll();
 					
 				}
+			}else{
+				Thread.currentThread().interrupt();
 			}
 		}
 	}

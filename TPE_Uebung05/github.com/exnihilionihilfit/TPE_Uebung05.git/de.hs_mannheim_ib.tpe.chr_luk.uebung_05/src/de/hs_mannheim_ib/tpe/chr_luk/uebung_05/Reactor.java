@@ -15,7 +15,7 @@ public class Reactor extends Component implements Runnable, Heatable {
 	private WaterPackage tmp;
 
 	public Reactor(CoolingCircuit cc) {
-		this.warming = 42;
+		this.warming = 43;
 		this.maxTemp = 2878;
 		this.coreTemp = 10;
 
@@ -28,37 +28,50 @@ public class Reactor extends Component implements Runnable, Heatable {
 
 	@Override
 	public void run() {
-
-		while (true) {
-
-			if (!this.isShutdown()) {
+		
+		while (!Thread.currentThread().isInterrupted()) {
+	
+		
+			if (!this.isShutdown() && !isOverheated()) {
 
 				synchronized (cc) {
-
+		
+					
+					while (this.isMinTempAddReached()) {
+			
+					
+						try {
+							cc.notifyAll();
+							cc.wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						tmpTime = new Date().getTime() - this.timeStamp;
+					}
+				
 					tmpTime = new Date().getTime() - this.timeStamp;
 					// Convert tmpTime to seconds multiply with warming constant
 					if ((float) tmpTime / 1000 * this.warming >= 1
-					        && !this.isShutdown()) {
+					       ) {
 						this.coreTemp += (float) tmpTime / 1000 * this.warming;
 						this.timeStamp = new Date().getTime();
 					}
-					cc.notifyAll();
-					try {
-						cc.wait();
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+
 				}
 
-			}else{
-				synchronized (cc) {
-					cc.notifyAll();
-					
-				}
+			} else {
+			
+				Thread.currentThread().interrupt();
 			}
+
 		}
 	}
+
+	private boolean isMinTempAddReached() {
+		
+	    return ((float) tmpTime / 1000 * this.warming < 1);
+    }
 
 	public boolean isOverheated() {
 		if (this.coreTemp >= this.maxTemp) {
@@ -81,17 +94,27 @@ public class Reactor extends Component implements Runnable, Heatable {
 
 	@Override
 	public String toString() {
-		return "Core Temperature: " + Math.round(this.coreTemp)+" [ is aktive  "+!this.isShutdown()+" ]";
+		
+		return "Core Temperature: " + Math.round(this.coreTemp)
+		        + " [ is aktive  " + !this.isShutdown() + " ]";
 	}
 
-	void coolingComponent() {
 
-		if (!tmp.equals(this.recuperator.getWaterPackage())) {
+	private boolean isWaterPumped() {
+		
 
-			this.recuperator.coolComponent();
-			tmp = this.recuperator.getWaterPackage();
+		if (tmp.equals(this.recuperator.getWaterPackage())) {	
+			return false;
 		} else {
+			tmp = this.recuperator.getWaterPackage();
+			return true;
+		}
+	}
+	
+	protected void coolingComponent() {
 
+		if (this.isWaterPumped()) {
+			this.recuperator.coolComponent();
 		}
 	}
 

@@ -2,7 +2,7 @@ package de.hs_mannheim_ib.tpe.chr_luk.uebung_05;
 
 import java.util.Date;
 
-public class River extends Component implements Runnable, Heatable {
+public class River extends Component implements  Heatable {
 
 	private float waterTemperatur; // C°
 	private float drainTemperature; // C° back to the river
@@ -22,32 +22,7 @@ public class River extends Component implements Runnable, Heatable {
 		tmp = this.recuperator.getWaterPackage();
 	}
 
-	@Override
-	public void run() {
 
-		while (true) {
-
-			if (!this.isShutdown()) {
-				synchronized (cc) {
-					// System.out.println("river is working");
-
-					cc.notifyAll();
-					try {
-						cc.wait();
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-				}
-			}else{
-				synchronized (cc) {
-					cc.notifyAll();
-					
-				}
-			}
-		}
-	}
 
 	@Override
 	public void setHeat(float heat) {
