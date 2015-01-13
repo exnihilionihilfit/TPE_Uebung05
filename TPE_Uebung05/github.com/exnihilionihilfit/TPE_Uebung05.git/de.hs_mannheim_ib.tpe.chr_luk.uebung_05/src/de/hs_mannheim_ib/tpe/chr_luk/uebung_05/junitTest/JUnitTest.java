@@ -60,12 +60,8 @@ public class JUnitTest {
 		
 		assertEquals(t.getState(), Thread.State.WAITING);
 		
-		reactor.setShutdown(true);
-		t.interrupt();
-		
-		System.out.println(t.getState());
-		
-		eMsg.toString();
+	
+	
 	}
 
 }
