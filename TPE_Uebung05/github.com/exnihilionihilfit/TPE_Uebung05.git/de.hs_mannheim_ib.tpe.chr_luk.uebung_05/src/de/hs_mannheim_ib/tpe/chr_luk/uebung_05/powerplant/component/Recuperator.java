@@ -23,6 +23,13 @@ public class Recuperator {
 	public int getPosInCircuit() {
 		return posInCircuit;
 	}
+	/**
+	 * @return the component
+	 */
+	public Heatable getComponent() {
+		return component;
+	}
+
 	public WaterPackage getWaterPackage(){
 		return this.cc.getWaterPackages().get(posInCircuit);
 	}

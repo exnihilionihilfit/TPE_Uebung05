@@ -1,18 +1,14 @@
 package de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.control;
 
 import java.util.Date;
-
 import de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component.Component;
 import de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component.cooling.CoolingCircuit;
-import de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component.cooling.WaterPackage;
-
 /**
  * 
  * the actual state of all power plant componi
  * @author 
  *
  */
-
 public class Output implements Runnable {
 
 	private CoolingCircuit cc;
@@ -48,8 +44,7 @@ public class Output implements Runnable {
 					System.out.println("");
 					for (Component comp : components) {
 						System.out.print(comp.toString());
-					}
-				
+					}				
 				
 					this.timeStamp = new Date();
 				
@@ -58,14 +53,11 @@ public class Output implements Runnable {
 		            } catch (InterruptedException e) {
 		            	ErrorMessage.addToList(e);
 		            }
-			
 				}
 			}else{
 				Thread.currentThread().interrupt();
-			}
-			
+			}			
 		}
-
 	}
 	/**
 	 * time div since last thread call
