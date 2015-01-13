@@ -58,7 +58,7 @@ public class Pump extends Component implements Runnable {
 					while (new Date().getTime() - this.timeStamp.getTime() < this.pumpInterval) {
 					
 						try {
-							cc.notifyAll();
+						
 							cc.wait();
 						} catch (InterruptedException e) {
 							ErrorMessage.addToList(e);
@@ -78,7 +78,7 @@ public class Pump extends Component implements Runnable {
 		            	ErrorMessage.addToList(e);
 		            }
 					
-					cc.notifyAll();
+				
 				}
 			}else{
 				Thread.currentThread().interrupt();

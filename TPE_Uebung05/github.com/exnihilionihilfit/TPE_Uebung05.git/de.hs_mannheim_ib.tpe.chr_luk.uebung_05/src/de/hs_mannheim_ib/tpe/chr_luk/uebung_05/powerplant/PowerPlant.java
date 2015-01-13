@@ -60,6 +60,10 @@ public class PowerPlant {
 		long timePast = 0;
 
 		while (!Thread.currentThread().isInterrupted()) {
+			
+			synchronized (coolingCircuit) {
+				coolingCircuit.notifyAll();
+            }
 
 			timePast = new Date().getTime() - startTime.getTime();
 
@@ -82,8 +86,6 @@ public class PowerPlant {
 
 			if (this.shutdown) {
 				
-			
-
 				if (this.areAllShutdown()) {
 					System.out.println("Powerplant is offline");
 					Thread.currentThread().interrupt();
@@ -104,9 +106,7 @@ public class PowerPlant {
 
 	private boolean areAllShutdown() {
 		for (int i = 0; i < allThreads.size(); i++) {
-			synchronized (coolingCircuit) {
-				coolingCircuit.notifyAll();
-            }
+		
 			if (!allThreads.get(i).getState().equals(Thread.State.TERMINATED)) {
 
 				return false;

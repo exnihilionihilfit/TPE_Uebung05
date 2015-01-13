@@ -32,7 +32,7 @@ public class Output implements Runnable {
 					while (this.getTimeDiv() < this.timeWait) {
 					
 						try {
-							cc.notifyAll();
+						
 							cc.wait();
 						} catch (InterruptedException e) {
 							ErrorMessage.addToList(e);
@@ -59,7 +59,7 @@ public class Output implements Runnable {
 		            } catch (InterruptedException e) {
 		            	ErrorMessage.addToList(e);
 		            }
-					cc.notifyAll();
+			
 				}
 			}else{
 				Thread.currentThread().interrupt();

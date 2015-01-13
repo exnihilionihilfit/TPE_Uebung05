@@ -45,7 +45,7 @@ public class Reactor extends Component implements Runnable, Heatable {
 			
 					
 						try {
-							cc.notifyAll();
+						
 							cc.wait();
 						} catch (InterruptedException e) {
 							ErrorMessage.addToList(e);
@@ -71,7 +71,7 @@ public class Reactor extends Component implements Runnable, Heatable {
 		            } catch (InterruptedException e) {
 		            	ErrorMessage.addToList(e);
 		            }
-					cc.notifyAll();
+			
 				}
 			
 			} else {
