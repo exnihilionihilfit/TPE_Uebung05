@@ -40,6 +40,7 @@ public class Recuperator {
 		float tmpTemp = component.getHeat() + coolingWater.getHeat();
 		tmpTemp /= 2;
 	
+		
 		component.setHeat(tmpTemp);
 		coolingWater.setHeat(tmpTemp);
 		

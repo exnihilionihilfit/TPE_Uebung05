@@ -14,28 +14,24 @@ public class Pump extends Component implements Runnable {
 	private WaterPackage tmpPackage;
 	private Date timeStamp;
 	private double pumpInterval;
-	private volatile boolean shutdown;
+	private boolean shutdown;
 
 	public Pump(float pumpPower, CoolingCircuit cc) {
 		this.pumpPower = pumpPower;
 		this.cc = cc;
 		this.timeStamp = new Date();
+		// pump actions per second (div. 1000 to converte to seconds)
 		this.pumpInterval = 1000 / this.pumpPower;
-	}
-
-	public void pumping() {
-
-		tmpPackage = cc.getWaterPackages().remove(0);
-		cc.getWaterPackages().add(tmpPackage);
-
+		this.shutdown = false;
 	}
 
 	/**
-	 * @return the pumpPower
+	 * pick the first element from the list and add it to the same list ( as
+	 * last element ) to "pump" the water
 	 */
-	public double getPumpPower() {
-
-		return pumpPower;
+	public void pumping() {
+		tmpPackage = cc.getWaterPackages().remove(0);
+		cc.getWaterPackages().add(tmpPackage);
 	}
 
 	/**
@@ -47,45 +43,39 @@ public class Pump extends Component implements Runnable {
 		this.pumpPower = pumpPower;
 	}
 
+	/**
+	 * circutling the water packages in the cooling circuit synchronized over
+	 * cooling circuit thread waits each thread call
+	 */
+
 	@Override
 	public void run() {
 
 		while (!Thread.currentThread().isInterrupted()) {
-		
-			if (!this.isShutdown()) {
-				synchronized (cc) {
 
+			if (!this.shutdown) {
+				synchronized (cc) {
 					while (new Date().getTime() - this.timeStamp.getTime() < this.pumpInterval) {
-					
 						try {
-						
 							cc.wait();
 						} catch (InterruptedException e) {
 							ErrorMessage.addToList(e);
 						}
-
 					}
-
-					// System.out.println("pump is working");
-
+					
 					this.timeStamp = new Date();
 					this.pumping();
-					
-				
+
 					try {
-			            Thread.sleep(10);
-		            } catch (InterruptedException e) {
-		            	ErrorMessage.addToList(e);
-		            }
-					
-				
+						Thread.sleep(10);
+					} catch (InterruptedException e) {
+						ErrorMessage.addToList(e);
+					}
+
 				}
-			}else{
+			} else {
 				Thread.currentThread().interrupt();
 			}
-			
-			
 		}
 	}
-
 }

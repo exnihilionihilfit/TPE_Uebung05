@@ -7,8 +7,6 @@ package de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component.Component;
 import de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component.Pump;
@@ -28,19 +26,23 @@ public class PowerPlant {
 	private Thread pumpThread;
 	private Thread reactorThread;
 	private Thread outputThread;
-	private Thread riverThread;
-	private Date timeStamp = new Date();
-	private long runTime;
-	private boolean shutdown = false;
-	private int minTemp;
+	private long runTime;	
 	private float pumpInterval;
 	private ArrayList<Thread> allThreads;
 	private ErrorMessage msg;
 
-	public PowerPlant() {
-		this.minTemp = 30; // minimal temperature which must reach for shutdown
-		this.runTime = 20000; // running time for powerplant (in mil. seconds)
-		this.pumpInterval = 1;
+	/**
+	 * Init. all components and starts 3 Threads
+	 *
+	 * @param runTime
+	 *            of the power plant
+	 * @param pumpInterval
+	 *            of the cooling circuit
+	 */
+	public PowerPlant(int runTime, float pumpInterval) {
+
+		this.runTime = runTime; // running time for powerplant (in mil. seconds)
+		this.pumpInterval = pumpInterval;
 
 		// intitialize all powerplant components
 		initComponents();
@@ -54,46 +56,42 @@ public class PowerPlant {
 
 	}
 
+	/**
+	 * running the main loop which controls the 3 threads each thread is
+	 * joined() and will be waked up by sync. coolingCiruit. After time is up or
+	 * the reactor have a melt down the power plant will shutdown
+	 * 
+	 */
 	private void startPowerPlant() {
 		Date startTime = new Date();
 
 		long timePast = 0;
 
 		while (!Thread.currentThread().isInterrupted()) {
-			
+
+			// Wake up all Threads
 			synchronized (coolingCircuit) {
 				coolingCircuit.notifyAll();
-            }
+			}
 
 			timePast = new Date().getTime() - startTime.getTime();
 
 			reactor.coolingComponent();
 			river.coolingComponent();
 
+			// give signal to terminate threads internally
 			if (timePast > this.runTime || reactor.isOverheated()) {
 
 				this.reactor.setShutdown(true);
+				this.river.setShutdown(true);
+				this.pump.setShutdown(true);
+				this.output.setShutdown(true);
 
-				if (this.minTempReached()) {
-
-					this.river.setShutdown(true);
-					this.pump.setShutdown(true);
-					this.output.setShutdown(true);
-					this.shutdown = true;
-
-				}
+				System.out.println("Powerplant is offline");
+				Thread.currentThread().interrupt();
 			}
 
-			if (this.shutdown) {
-				
-				if (this.areAllShutdown()) {
-					System.out.println("Powerplant is offline");
-					Thread.currentThread().interrupt();
-
-				}
-
-			} else {
-
+			else {
 				try {
 					Thread.sleep(10);
 				} catch (InterruptedException e) {
@@ -104,29 +102,19 @@ public class PowerPlant {
 
 	}
 
-	private boolean areAllShutdown() {
-		for (int i = 0; i < allThreads.size(); i++) {
-		
-			if (!allThreads.get(i).getState().equals(Thread.State.TERMINATED)) {
-
-				return false;
-			}
-		}
-		return true;
-	}
-
-	private void getThreadStates() {
-		System.out.println(reactorThread.getState() + " "
-		        + pumpThread.getState() + " " + outputThread.getState());
-	}
-
+	/**
+	 * init all components and save the threads in field allThreads to loop over
+	 * there state to proper terminate them
+	 */
 	private void initComponents() {
-		coolingCircuit = new CoolingCircuit(this.minTemp,1200, 100); // liter in the hole
-		                                                // cooling circuit and
-		                                                // liter each water-unit
-		pump = new Pump(this.pumpInterval, coolingCircuit);
-		reactor = new Reactor(coolingCircuit);
-		river = new River(coolingCircuit);
+		this.coolingCircuit = new CoolingCircuit( 1200, 100); // liter
+		// in the
+		// hole
+		// cooling circuit and
+		// liter each water-unit
+		this.pump = new Pump(this.pumpInterval, coolingCircuit);
+		this.reactor = new Reactor(coolingCircuit);
+		this.river = new River(coolingCircuit);
 
 		// add them to an array only for output
 		Component[] components = new Component[2];
@@ -134,22 +122,18 @@ public class PowerPlant {
 		components[0] = reactor;
 		components[1] = river;
 
-		output = new Output(coolingCircuit, components);
+		// last parameter is update rate in mili. seconds
+		this.output = new Output(coolingCircuit, components); 
 
 		this.allThreads = new ArrayList<>();
 
-		msg = new ErrorMessage();
+		this.msg = new ErrorMessage();
 	}
 
-	private boolean minTempReached() {
-		if (reactor.getHeat() < this.minTemp
-		        && coolingCircuit.isNormTemperature()) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
+	/**
+	 * the reactor wich produce energy and warms. is added to allThreads and
+	 * joined which all other threads
+	 */
 	private void startReactor() {
 		reactorThread = new Thread(reactor);
 		try {
@@ -159,9 +143,12 @@ public class PowerPlant {
 		}
 		reactorThread.start();
 		this.allThreads.add(reactorThread);
-
 	}
 
+	/**
+	 * the pump which pumps the cooling water is added to allThreads and joined
+	 * which all other threads
+	 */
 	private void startPump() {
 		pumpThread = new Thread(pump);
 		try {
@@ -174,6 +161,10 @@ public class PowerPlant {
 
 	}
 
+	/**
+	 * output all information to the conole is added to allThreads and joined
+	 * which all other threads
+	 */
 	private void startOutput() {
 		outputThread = new Thread(output);
 		try {

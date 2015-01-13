@@ -2,15 +2,23 @@ package de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component.cooling;
 
 import java.util.ArrayList;
 
+/**
+ * mainly has a waterPackages List which has a number of so 
+ * called water packages each one could exchange heat with a component
+ * its "filled" by constructor, cant be changed after power plant runs
+ * @author 
+ *
+ */
+
 public class CoolingCircuit {
 
-	private final float normTemperature ;
+
 	private volatile ArrayList<WaterPackage> waterPackages;
 	private int waterVolume;
 	private int waterPerPackage;
 
-	public CoolingCircuit(int normTemp ,int waterVolume, int waterPerPackage) {
-		this.normTemperature = normTemp;
+	public CoolingCircuit(int waterVolume, int waterPerPackage) {
+	
 		this.waterPackages = new ArrayList<>();
 		this.waterVolume = waterVolume;
 		this.waterPerPackage = waterPerPackage;
@@ -33,30 +41,19 @@ public class CoolingCircuit {
 	public void setWaterPackages(ArrayList<WaterPackage> waterPackages) {
 		this.waterPackages = waterPackages;
 	}
+	/**
+	 * fills the cooling circuit with water packages
+	 * by given values for volume per package 
+	 */
 
 	private void fillCoolingCircuit() {
+		// number of packages is the whole water volume div. to number of packages
 		int numPackage = this.waterVolume / this.waterPerPackage;
 
 		for (int i = 0; i < numPackage; i++) {
 			this.waterPackages
-			        .add(new WaterPackage(this.waterPerPackage, 10, i));
+			        .add(new WaterPackage(this.waterPerPackage, 10,i));
 		}
 	}
-
-	public boolean isNormTemperature() {
-
-		synchronized (this) {
-			for (WaterPackage pack : waterPackages) {
-
-				if (pack.getHeat() > this.normTemperature) {
-					return false;
-				}
-
-			}
-
-			return true;
-		}
-	}
-	
 
 }
