@@ -53,13 +53,13 @@ public class Output implements Runnable {
 					System.out.println(tmp);
 
 					this.timeStamp = new Date();
-					cc.notifyAll();
+				
 					try {
 			            Thread.sleep(10);
 		            } catch (InterruptedException e) {
 		            	ErrorMessage.addToList(e);
 		            }
-				
+					cc.notifyAll();
 				}
 			}else{
 				Thread.currentThread().interrupt();

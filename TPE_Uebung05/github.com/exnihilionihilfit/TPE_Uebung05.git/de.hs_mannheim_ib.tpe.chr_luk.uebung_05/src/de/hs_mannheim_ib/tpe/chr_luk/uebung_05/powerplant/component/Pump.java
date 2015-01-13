@@ -70,13 +70,15 @@ public class Pump extends Component implements Runnable {
 
 					this.timeStamp = new Date();
 					this.pumping();
-					cc.notifyAll();
+					
 				
 					try {
 			            Thread.sleep(10);
 		            } catch (InterruptedException e) {
 		            	ErrorMessage.addToList(e);
 		            }
+					
+					cc.notifyAll();
 				}
 			}else{
 				Thread.currentThread().interrupt();

@@ -65,12 +65,13 @@ public class Reactor extends Component implements Runnable, Heatable {
 					
 		
 
-					cc.notifyAll();
+					
 					try {
 			            Thread.sleep(10);
 		            } catch (InterruptedException e) {
 		            	ErrorMessage.addToList(e);
 		            }
+					cc.notifyAll();
 				}
 			
 			} else {

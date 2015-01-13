@@ -4,12 +4,13 @@ import java.util.ArrayList;
 
 public class CoolingCircuit {
 
-	private static final float normTemperature = 20;
+	private final float normTemperature ;
 	private volatile ArrayList<WaterPackage> waterPackages;
 	private int waterVolume;
 	private int waterPerPackage;
 
-	public CoolingCircuit(int waterVolume, int waterPerPackage) {
+	public CoolingCircuit(int normTemp ,int waterVolume, int waterPerPackage) {
+		this.normTemperature = normTemp;
 		this.waterPackages = new ArrayList<>();
 		this.waterVolume = waterVolume;
 		this.waterPerPackage = waterPerPackage;

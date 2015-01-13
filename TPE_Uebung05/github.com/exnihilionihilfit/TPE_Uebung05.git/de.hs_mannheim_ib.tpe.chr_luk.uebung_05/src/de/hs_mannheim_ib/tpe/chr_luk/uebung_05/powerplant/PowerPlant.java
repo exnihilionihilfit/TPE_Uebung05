@@ -32,13 +32,13 @@ public class PowerPlant {
 	private Date timeStamp = new Date();
 	private long runTime;
 	private boolean shutdown = false;
-	private float minTemp;
+	private int minTemp;
 	private float pumpInterval;
 	private ArrayList<Thread> allThreads;
 	private ErrorMessage msg;
 
 	public PowerPlant() {
-		this.minTemp = 40; // minimal temperature which must reach for shutdown
+		this.minTemp = 30; // minimal temperature which must reach for shutdown
 		this.runTime = 20000; // running time for powerplant (in mil. seconds)
 		this.pumpInterval = 1;
 
@@ -81,6 +81,8 @@ public class PowerPlant {
 			}
 
 			if (this.shutdown) {
+				
+			
 
 				if (this.areAllShutdown()) {
 					System.out.println("Powerplant is offline");
@@ -102,7 +104,9 @@ public class PowerPlant {
 
 	private boolean areAllShutdown() {
 		for (int i = 0; i < allThreads.size(); i++) {
-
+			synchronized (coolingCircuit) {
+				coolingCircuit.notifyAll();
+            }
 			if (!allThreads.get(i).getState().equals(Thread.State.TERMINATED)) {
 
 				return false;
@@ -117,7 +121,7 @@ public class PowerPlant {
 	}
 
 	private void initComponents() {
-		coolingCircuit = new CoolingCircuit(1200, 100); // liter in the hole
+		coolingCircuit = new CoolingCircuit(this.minTemp,1200, 100); // liter in the hole
 		                                                // cooling circuit and
 		                                                // liter each water-unit
 		pump = new Pump(this.pumpInterval, coolingCircuit);
