@@ -129,7 +129,7 @@ public class Reactor extends Component implements Runnable, Heatable {
 		if (this.isShutdown()) {
 			output += " [reactor offline]\n ";
 		}
-		output += "Core Temperature: " + Math.round(this.coreTemp);
+		output += "reactor recuperator temperature: " + Math.round(this.coreTemp);
 		return output;
 	}
 

@@ -14,7 +14,7 @@ import de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.control.ErrorMessage;
 
 public class JUnitTest {
 
-
+	@Test
 	public void testPowerPlant() {
 
 		PowerPlant pp = new PowerPlant(20000, 1);
@@ -52,13 +52,7 @@ public class JUnitTest {
 		
 		assertEquals(t.getState(), Thread.State.RUNNABLE);
 		
-		try {
-	        Thread.sleep(100);
-        } catch (InterruptedException e) {
-	      fail();
-        }
 		
-		assertEquals(t.getState(), Thread.State.WAITING);
 		
 	
 	

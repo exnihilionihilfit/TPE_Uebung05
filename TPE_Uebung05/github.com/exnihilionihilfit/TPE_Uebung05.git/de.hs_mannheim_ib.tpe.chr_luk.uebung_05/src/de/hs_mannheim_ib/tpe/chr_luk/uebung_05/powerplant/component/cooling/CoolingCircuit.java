@@ -1,6 +1,8 @@
 package de.hs_mannheim_ib.tpe.chr_luk.uebung_05.powerplant.component.cooling;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * mainly has a waterPackages List which has a number of so 
@@ -13,13 +15,13 @@ import java.util.ArrayList;
 public class CoolingCircuit {
 
 
-	private volatile ArrayList<WaterPackage> waterPackages;
+	private List<WaterPackage> waterPackages;
 	private int waterVolume;
 	private int waterPerPackage;
 
 	public CoolingCircuit(int waterVolume, int waterPerPackage) {
 	
-		this.waterPackages = new ArrayList<>();
+		this.waterPackages =Collections.synchronizedList( new ArrayList<>());
 		this.waterVolume = waterVolume;
 		this.waterPerPackage = waterPerPackage;
 
@@ -30,7 +32,7 @@ public class CoolingCircuit {
 	/**
 	 * @return the waterPackages
 	 */
-	public ArrayList<WaterPackage> getWaterPackages() {
+	public List<WaterPackage> getWaterPackages() {
 		return waterPackages;
 	}
 

@@ -44,7 +44,7 @@ public class PowerPlant {
 		this.runTime = runTime; // running time for powerplant (in mil. seconds)
 		this.pumpInterval = pumpInterval;
 
-		// intitialize all powerplant components
+		// intitialize all power plant components
 		initComponents();
 
 		// activet all components
@@ -87,7 +87,7 @@ public class PowerPlant {
 				this.pump.setShutdown(true);
 				this.output.setShutdown(true);
 
-				System.out.println("Powerplant is offline");
+				System.out.println("\n Powerplant is offline");
 				Thread.currentThread().interrupt();
 			}
 
